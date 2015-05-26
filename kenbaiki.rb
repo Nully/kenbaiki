@@ -118,6 +118,7 @@ Pry.prompt = [
   proc{"Kenbaiki* "}
 ]
 
-
+Pry.run_command "help"
+puts ""
 
 pry
