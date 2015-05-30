@@ -23,46 +23,57 @@ class Kenbaiki
   class << self
     def init
       # 投入金額の合計
-      @@investmentTotal = 0
-      @@totalAmount = 0
+      @@investment_total = 0
+      @@total_amount = 0
+    end
+
+    def format amount
+      "#{amount} 円"
     end
 
     # 投入金額の出力
     def total
-      "#{@@investmentTotal} 円"
+      format @@investment_total
     end
 
     # 売上の表示
     def amount
-      "#{@@totalAmount} 円"
+      format @@total_amount
     end
 
     def add_money money
-      unless self::ALLOW_MONYE_TYPES.keys.include?(money)
-        return "#{money}円は許可されていないお金です。"
-      end
-      @@investmentTotal += money
+      return "#{money}円は許可されていないお金です。" unless accept_money?(money)
+      @@investment_total += money
     end
 
     # 払い戻す
     def pay_back
       msg = "釣り銭 : #{self.total}"
-      @@investmentTotal = 0
+      @@investment_total = 0
       msg
     end
 
     # チケットを購入する
     def buy_ticket money
-      unless self::TICKETS.keys.include?(money)
-        return "券は#{Kenbaiki::TICKETS.values.join(" ")}のみ購入できます。"
-      end
-      if money > @@investmentTotal
-        return "投入金額が#{money - @@investmentTotal} 円不足しています。"
-      end
-      @@investmentTotal -= money
-      @@totalAmount += money
+      return "券は#{Kenbaiki::TICKETS.values.join(" ")}のみ購入できます。" if !accept_ticket?(money)
+      return "投入金額が#{money - @@investment_total} 円不足しています。" if available_purchase?(money)
+
+      @@investment_total -= money
+      @@total_amount += money
       puts "#{Kenbaiki::TICKETS[money]}の券を購入しました。"
       puts self.pay_back
+    end
+
+    def accept_money? amount
+      self::ALLOW_MONYE_TYPES.keys.include?(amount)
+    end
+
+    def accept_ticket? money
+      self::TICKETS.keys.include?(money)
+    end
+
+    def available_purchase? money
+      money > @@investment_total
     end
   end
 
